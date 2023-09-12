@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Data Artistry</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'top_bar.html' %}
+
+
+    <h1 style="text-align:center;"> Unveiling Insights through Visualizations</h1>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        <div style="text-align: center;">
+            <canvas id="brandChart" width="400" height="400"></canvas>
+            <p><strong>Brand Distribution</strong></p>
+        </div>
+
+        <div style="text-align: center;">
+            <canvas id="modelChart" width="400" height="400"></canvas>
+            <p><strong>Model Distribution</strong></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="text-center">Sneaker Collection</h2>
+        <div class="scrollable-table">
+            <table class="table" id="sneakerTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Name</th>
+                        <th onclick="sortTable(1)">Model</th>
+                        <th onclick="sortTable(2)">Condition</th>
+                        <th onclick="sortTable(3)">Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sneaker in sneakers %}
+                    <tr>
+                        <td>{{ sneaker.name }}</td>
+                        <td>{{ sneaker.model }}</td>
+                        <td>{{ sneaker.condition }}</td>
+                        <td>{{ sneaker.size }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var brandCtx = document.getElementById('brandChart').getContext('2d');
+        var modelCtx = document.getElementById('modelChart').getContext('2d');
+
+        var brandData = {{ brands| tojson | safe }};
+        var modelData = {{ models| tojson | safe }};
+
+        var brandLabels = brandData.map(item => item[0]);
+        var brandValues = brandData.map(item => item[1]);
+
+        var modelLabels = modelData.map(item => item[0]);
+        var modelValues = modelData.map(item => item[1]);
+
+        var colors = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+            '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D'];
+
+        new Chart(brandCtx, {
+            type: 'pie',
+            data: {
+                labels: brandLabels,
+                datasets: [{
+                    data: brandValues,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+
+        new Chart(modelCtx, {
+            type: 'pie',
+            data: {
+                labels: modelLabels,
+                datasets: [{
+                    data: modelValues,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+
+</body>
+
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <title>Data Artistry</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    {% include 'top_bar.html' %}
+
+    <h1 style="text-align:center;"> Unveiling Insights through Visualizations</h1>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        <div style="text-align: center;">
+            <canvas id="brandChart" width="400" height="400"></canvas>
+            <p><strong>Brand Distribution</strong></p>
+        </div>
+
+        <div style="text-align: center;">
+            <canvas id="modelChart" width="400" height="400"></canvas>
+            <p><strong>Model Distribution</strong></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 style="text-align:center;">Sneaker Collection</h2>
+        <table class="table" id="sneakerTable">
+            <thead>
+                <tr>
+                    
+                    <th onclick="sortTable(0)">Name</th>
+                    <th onclick="sortTable(1)">Model</th>
+                    <th onclick="sortTable(2)">Condition</th>
+                    <th onclick="sortTable(3)">Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sneaker in sneakers %}
+                <tr>
+                    <td>{{ sneaker.name }}</td>
+                    <td>{{ sneaker.model }}</td>
+                    <td>{{ sneaker.condition }}</td>
+                    <td>{{ sneaker.size }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("sneakerTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        var brandCtx = document.getElementById('brandChart').getContext('2d');
+        var modelCtx = document.getElementById('modelChart').getContext('2d');
+
+        var brandData = {{ brands| tojson | safe }};
+        var modelData = {{ models| tojson | safe }};
+
+        var brandLabels = brandData.map(item => item[0]);
+        var brandValues = brandData.map(item => item[1]);
+
+        var modelLabels = modelData.map(item => item[0]);
+        var modelValues = modelData.map(item => item[1]);
+
+        var colors = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+            '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D'];
+
+        new Chart(brandCtx, {
+            type: 'pie',
+            data: {
+                labels: brandLabels,
+                datasets: [{
+                    data: brandValues,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+
+        new Chart(modelCtx, {
+            type: 'pie',
+            data: {
+                labels: modelLabels,
+                datasets: [{
+                    data: modelValues,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+    </script>
+
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html> -->

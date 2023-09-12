@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Sneaker</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    {% include 'top_bar.html' %}
+    {% from "form_macro.html" import form_field %}
+
+    <div class="container">
+        <h1>Add Sneaker</h1>
+        <form action="{{ url_for('add_sneaker') }}" method="post">
+            {% for field in ['name', 'sku', 'brand', 'model', 'image', 'condition', 'location'] %}
+                {{ form_field('input', field, field.capitalize()) }}
+            {% endfor %}
+            {{ form_field('select', 'size', 'Size', ['11', '12', '13']) }}
+            {{ form_field('textarea', 'description', 'Description') }}
+            <input type="submit" value="Add Sneaker" class="btn btn-primary">
+        </form>
+    </div>
+
+    <!-- Add these lines for Bootstrap JS components -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
